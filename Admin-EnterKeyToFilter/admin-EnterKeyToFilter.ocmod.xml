@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Admin Enter Key Filters</name>
+    <version>1.0</version>
+    <code>AdminEnterKeyFilters</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="admin/view/template/catalog/product_list.tpl">
+        <operation>
+        	<search><![CDATA[
+$('#button-filter').on('click', function() {
+            ]]></search>
+            <add position="before"><![CDATA[
+
+$(document).keypress(function(e) {
+  if(e.which == 13) {
+     $("#button-filter").click();
+  }
+});
+
+            ]]></add>
+		</operation>
+	</file>
+
+    <file path="admin/view/template/sale/order_list.tpl">
+        <operation>
+            <search><![CDATA[
+$('#button-filter').on('click', function() {
+            ]]></search>
+            <add position="before"><![CDATA[
+
+$(document).keypress(function(e) {
+  if(e.which == 13) {
+     $("#button-filter").click();
+  }
+});
+
+            ]]></add>
+        </operation>
+    </file>
+
+</modification>

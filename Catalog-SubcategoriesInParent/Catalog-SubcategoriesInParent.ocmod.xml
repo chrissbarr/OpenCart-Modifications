@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Subcategory Products in Parent Categories</name>
+    <version>1.0</version>
+    <code>SubcategoryProductsinParent</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="catalog/controller/product/category.php">
+        <operation>
+        	<search><![CDATA[
+            'filter_category_id' => $category_id,
+            ]]></search>
+            <add position="after"><![CDATA[
+            'filter_sub_category' => true,
+            ]]></add>
+		</operation>
+	</file>
+</modification>

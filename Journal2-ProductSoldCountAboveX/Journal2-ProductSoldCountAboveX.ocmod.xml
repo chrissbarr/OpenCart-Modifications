@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Only Display Product Sold Count Above Quantity X</name>
+    <version>1.0</version>
+    <code>OnlyDisplayProductSoldCountAboveX</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="catalog/view/theme/journal2/template/product/product.tpl">
+        <operation>
+        	<search><![CDATA[
+            <?php if($this->journal2->settings->get('product_sold')): ?>
+            ]]></search>
+            <add position="replace"><![CDATA[
+            <?php if($this->journal2->settings->get('product_sold') && (abs((int) filter_var($this->journal2->settings->get('product_sold'), FILTER_SANITIZE_NUMBER_INT))) > 10): ?> 
+            ]]></add>
+		</operation>
+	</file>
+
+    <file path="catalog/view/theme/journal2/template/journal2/quickview/quickview.tpl">
+        <operation>
+            <search><![CDATA[
+            <?php if($this->journal2->settings->get('product_sold')): ?>
+            ]]></search>
+            <add position="replace"><![CDATA[
+            <?php if($this->journal2->settings->get('product_sold') && (abs((int) filter_var($this->journal2->settings->get('product_sold'), FILTER_SANITIZE_NUMBER_INT))) > 10): ?> 
+            ]]></add>
+        </operation>
+    </file>
+</modification>
