@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Print Shipping labels</name>
+    <version>1.0</version>
+    <code>Print Shipping Labels</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="admin/controller/sale/order.php">
+      <operation>
+        	<search index="4"><![CDATA[
+          $format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city} {postcode}' . "\n" . '{zone}' . "\n" . '{country}';
+            ]]></search>
+            <add position="replace"><![CDATA[
+          $format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city}, {zone_code} {postcode}';
+            ]]></add>
+		  </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search index="2"><![CDATA[
+          $format = $order_info['shipping_address_format'];
+            ]]></search>
+            <add position="replace"><![CDATA[
+          $format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city}, {zone_code} {postcode}';
+            ]]></add>
+      </operation>
+    </file>
+
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+      if ($order_info && $order_info['shipping_code']) {
+            ]]></search>
+            <add position="replace"><![CDATA[
+      if ($order_info && $order_info['shipping_code'] || $order_info && $order_info['shipping_method']) {
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'firstname' => $order_info['shipping_firstname'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'firstname' => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_firstname'])),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'lastname'  => $order_info['shipping_lastname'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'lastname'  => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_lastname'])),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'company'   => $order_info['shipping_company'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'company'   => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_company'])),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'address_1' => $order_info['shipping_address_1'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'address_1' => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_address_1'])),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'address_2' => $order_info['shipping_address_2'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'address_2' => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_address_2'])),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'city'      => $order_info['shipping_city'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'city'      => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_city'])),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'zone'      => $order_info['shipping_zone'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'zone'      => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_zone'])),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'zone_code' => $order_info['shipping_zone_code'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'zone_code' => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  (empty($order_info['shipping_zone_code']) ? $order_info['shipping_zone'] : $order_info['shipping_zone_code']))),
+            ]]></add>
+      </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+          'country'   => $order_info['shipping_country'],
+            ]]></search>
+            <add position="replace"><![CDATA[
+          'country'   => ucwords(preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $order_info['shipping_country'])),
+            ]]></add>
+      </operation>
+    </file>
+
+</modification>
