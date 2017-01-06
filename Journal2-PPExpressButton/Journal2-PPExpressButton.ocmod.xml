@@ -43,6 +43,7 @@
             <div class="pull-right"><a href="<?php echo $checkout; ?>" class="btn-primary button"><?php echo $button_checkout; ?></a></div>
             ]]></search>
             <add position="replace"><![CDATA[
+            <?php if (!$error_warning) { ?>
             <div style="display: inline-block; float:right; margin-left:10px;">
             <a href="<?php echo $pp_payment_url; ?>" title="PayPal Express Checkout" style="text-decoration:none;" class="pp-express-button">
             <?php if ($pp_mobile) { ?>
@@ -52,6 +53,7 @@
             <?php } ?>
             </a>
             </div>
+            <?php } ?>
             <div class="pull-right"><a href="<?php echo $checkout; ?>" class="btn-primary button" style="width:170px;"><?php echo $button_checkout; ?></a></div>
             ]]></add>
         </operation>
