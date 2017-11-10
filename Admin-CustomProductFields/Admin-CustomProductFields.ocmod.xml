@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Custom Product Fields</name>
+    <version>1.0</version>
+    <code>CustomProductFields</code>
+    <author>Chris Barr</author>
+    <link></link>
+
+    <file path="admin/model/catalog/product.php">
+        <operation>
+            <search><![CDATA["', sort_order = '" . (int)$data['sort_order'] . ]]></search>
+            <add position="replace"><![CDATA["', sort_order = '" . (int)$data['sort_order'] . "', product_contents = '" . $this->db->escape($data['product_contents']) . ]]></add>
+        </operation>
+    </file>
+
+
+    <file path="admin/controller/catalog/product.php">
+        <operation>
+            <search><![CDATA[
+        $data['entry_sort_order'] = $this->language->get('entry_sort_order');
+            ]]></search>
+            <add position="after"><![CDATA[
+        $data['entry_product_contents'] = $this->language->get('entry_product_contents');            
+        ]]></add>
+        </operation>
+
+        <operation>
+            <search><![CDATA[
+        $data['help_isbn'] = $this->language->get('help_isbn');
+            ]]></search>
+            <add position="after"><![CDATA[
+        $data['help_product_contents'] = $this->language->get('help_product_contents');           
+        ]]></add>
+        </operation>
+
+        <operation>
+            <search><![CDATA[$data['isbn'] = '';]]></search>
+            <add position="after" offset="2"><![CDATA[
+        if (isset($this->request->post['product_contents'])) {
+            $data['product_contents'] = $this->request->post['product_contents'];
+        } elseif (!empty($product_info)) {
+            $data['product_contents'] = $product_info['product_contents'];
+        } else {
+            $data['product_contents'] = '';
+        }         
+        ]]></add>
+        </operation>
+    </file>
+    
+    <file path="admin/view/template/catalog/product_form.tpl">
+        <operation>
+            <search><![CDATA[
+<div class="tab-pane" id="tab-data">
+                    ]]></search>
+            <add position="before" offset="2"><![CDATA[
+<div class="form-group">
+     <label class="col-sm-2 control-label" for="input-product_contents">
+         <span data-toggle="tooltip" title="<?php echo $help_product_contents; ?>"><?php echo $entry_product_contents; ?></span>
+     </label>
+     <div class="col-sm-10">
+        <textarea name="product_contents" rows="10" placeholder="<?php echo $entry_product_contents; ?>" id="input-product_contents" class="<?php if ($ckeditor_enabled == 1) { ?>form-control<?php } else { ?>form-control summernote<?php } ?>" /><?php echo isset($product_contents) ? $product_contents : ''; ?></textarea>
+     </div>
+</div>
+            ]]></add>
+        </operation>
+	</file>
+
+    <file path="admin/language/*/catalog/product.php">
+        <operation>
+            <search><![CDATA[
+$_['entry_recurring']        = 'Recurring Profile';
+            ]]></search>
+            <add position="after"><![CDATA[
+$_['entry_product_contents']      = 'Product Contents';
+            ]]></add>
+        </operation>
+
+        <operation>
+            <search><![CDATA[
+$_['help_tag']               = 'Comma separated';
+            ]]></search>
+            <add position="after"><![CDATA[
+$_['help_product_contents']       = 'List of product contents';
+            ]]></add>
+        </operation>
+    </file>
+  
+
+</modification>
