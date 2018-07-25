@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Limit Journal 2 Quick Checkout Address Length</name>
+    <version>1.0</version>
+    <code>LimitCheckoutAddressLength</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="catalog/view/theme/journal2/template/journal2/checkout/address_form.tpl">
+        <operation>
+        	<search><![CDATA[<input type="text" name="<?php echo $type; ?>_address_]]></search>
+            <add position="replace"><![CDATA[<input type="text"  maxlength="40" name="<?php echo $type; ?>_address_]]></add>
+		</operation>
+	</file>
+</modification>
