@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Product Has Label Name</name>
+    <version>1.0</version>
+    <code>ProductHasLabelName</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="admin/view/template/catalog/product_form.tpl">
+        <operation>
+            <search position="before"><![CDATA[<div class="tab-pane" id="tab-design">]]></search>
+            <add><![CDATA[
+                  <div class="tab-pane" id="tab-custom">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-entry-name"><?php echo $entry_label_name; ?></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="label_name" value="<?php echo $label_name; ?>" placeholder="<?php echo $entry_label_name; ?>" id="input-entry-name" class="form-control" />
+                        </div>
+                    </div>
+                  </div>
+            ]]></add>
+        </operation>
+	</file>
+
+    <file path="admin/controller/catalog/product.php">
+        <operation>
+            <search><![CDATA[
+        $data['entry_recurring'] = $this->language->get('entry_recurring');
+            ]]></search>
+            <add position="after"><![CDATA[
+        $data['entry_label_name'] = $this->language->get('entry_label_name');
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/language/*/product.php">
+        <operation>
+            <search><![CDATA[
+$_['entry_recurring']        = 'Recurring Profile';
+            ]]></search>
+            <add position="after"><![CDATA[
+$_['entry_label_name']        = 'Label Name';
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/controller/catalog/product.php">
+        <operation>
+            <search><![CDATA[
+$this->load->model('localisation/stock_status');
+            ]]></search>
+            <add position="before"><![CDATA[
+    if (isset($this->request->post['label_name'])) {
+            $data['label_name'] = $this->request->post['label_name'];
+        } elseif (!empty($product_info)) {
+            $data['label_name'] = $product_info['label_name'];
+        } else {
+            $data['label_name'] = '';
+        }
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/model/catalog/product.php">
+        <operation>
+            <search index="1"><![CDATA[
+$this->cache->delete('product');
+            ]]></search>
+            <add position="before"><![CDATA[
+    $this->db->query("
+                                INSERT INTO `" . DB_PREFIX . "product_custom_fields`
+                                SET
+                                     `product_id`  = '" . (int)$product_id . "',
+                                     `storage_label_name`        = '" . $data[label_name] . "'
+                            ");
+            ]]></add>
+        </operation>
+
+        <operation>
+            <search index="2"><![CDATA[
+$this->cache->delete('product');
+            ]]></search>
+            <add position="before"><![CDATA[
+    $this->db->query("
+                                UPDATE `" . DB_PREFIX . "product_custom_fields`
+                                SET
+                                     `storage_label_name`        = '" . $data[label_name] . "'
+                                WHERE
+                                     `product_id`  = '" . (int)$product_id . "'
+                            ");
+            ]]></add>
+        </operation>
+    </file>
+
+</modification>
