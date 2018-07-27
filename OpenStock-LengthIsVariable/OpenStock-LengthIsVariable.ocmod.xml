@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>OpenStock Length is Variable</name>
+    <version>1.0</version>
+    <code>OpenStockVariableLength</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="admin/controller/extension/module/openstock.php">
+
+        <operation>
+        	<search><![CDATA[
+            `price`         = '0.00',
+            ]]></search>
+            <add position="after"><![CDATA[
+            `length`         = '0.00',
+            ]]></add>
+		</operation>
+
+        <operation>
+            <search><![CDATA[
+            `price`         = '" . (float)$variant['price'] . "',
+            ]]></search>
+            <add position="after"><![CDATA[
+            `length`         = '" . (float)$variant['length'] . "',
+            ]]></add>
+        </operation>
+
+    </file>
+
+    <file path="admin/model/extension/module/openstock.php">
+
+        <operation>
+            <search><![CDATA[
+            'price'                      => $variant['price'],
+            ]]></search>
+            <add position="after"><![CDATA[
+            'length'                      => $variant['length'],
+            ]]></add>
+        </operation>
+
+    </file>
+
+    <file path="catalog/model/extension/module/openstock.php">
+
+        <operation>
+            <search><![CDATA[
+            'price'                      => $variant['price'],
+            ]]></search>
+            <add position="after"><![CDATA[
+            'length'                      => $variant['length'],
+            ]]></add>
+        </operation>
+
+    </file>  
+
+</modification>
