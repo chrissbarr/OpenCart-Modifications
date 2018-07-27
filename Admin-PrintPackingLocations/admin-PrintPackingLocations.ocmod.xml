@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Print Packing Locations</name>
+    <version>1.0</version>
+    <code>Print Packing Locations</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="admin/view/template/sale/order_list.tpl">
+      <operation>
+        	<search><![CDATA[
+<button type="submit" id="button-invoice" form="form-order" formaction="<?php echo $invoice; ?>" formtarget="_blank" data-toggle="tooltip" title="<?php echo $button_invoice_print; ?>" class="btn btn-info"><i class="fa fa-print"></i></button>
+            ]]></search>
+            <add position="after"><![CDATA[
+        <button type="submit" id="button-packing" form="form-order" formaction="<?php echo $packing; ?>" formtarget="_blank" data-toggle="tooltip" title="Packing List" class="btn btn-info"><i class="fa fa-print"></i></button>
+            ]]></add>
+		  </operation>
+    </file>
+
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+          <search><![CDATA[
+public function invoice() {
+            ]]></search>
+            <add position="before"><![CDATA[
+public function packing() {
+    $this->load->language('sale/order');
+
+    $data['title'] = 'Packing List';
+
+    if ($this->request->server['HTTPS']) {
+      $data['base'] = HTTPS_SERVER;
+    } else {
+      $data['base'] = HTTP_SERVER;
+    }
+
+    $data['direction'] = $this->language->get('direction');
+    $data['lang'] = $this->language->get('code');
+
+    $data['column_product'] = $this->language->get('column_product');
+    $data['column_model'] = $this->language->get('column_model');
+    $data['column_quantity'] = $this->language->get('column_quantity');
+    $data['column_price'] = $this->language->get('column_price');
+    $data['column_total'] = $this->language->get('column_total');
+
+    $this->load->model('sale/order');
+    $this->load->model('catalog/product');
+
+    $this->load->model('setting/setting');
+
+    $orders = array();
+
+    if (isset($this->request->post['selected'])) {
+      $orders = $this->request->post['selected'];
+    } elseif (isset($this->request->get['order_id'])) {
+      $orders[] = $this->request->get['order_id'];
+    }
+
+    $products_list = array();
+
+    foreach ($orders as $order_id) {
+      $order_info = $this->model_sale_order->getOrder($order_id);
+
+      if ($order_info) {
+
+        $product_data = array();
+
+        $products = $this->model_sale_order->getOrderProducts($order_id);
+
+        $this->load->model('tool/upload');
+
+        foreach ($products as $product) {
+          $option_data = array();
+
+          $options = $this->model_sale_order->getOrderOptions($order_id, $product['order_product_id']);
+
+          foreach ($options as $option) {
+            if ($option['type'] != 'file') {
+              $value = $option['value'];
+            } else {
+              $upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+
+              if ($upload_info) {
+                $value = $upload_info['name'];
+              } else {
+                $value = '';
+              }
+            }
+
+            $option_data[] = array(
+              'name'  => $option['name'],
+              'value' => $value
+            );
+          }
+
+          $productData = $this->model_catalog_product->getProduct($product['product_id']);
+          $productDesc = $this->model_catalog_product->getProductDescriptions($product['product_id']);
+
+          $thisProduct = array(
+            'name'     => $productDesc[1]['name'],
+            'model'    => $productData['model'],
+            'variant'  => ($product['model'] == $productData['model'] ? '' : $product['model']),
+            'location' => ($productData['location'] == '' ? 'Default' : $productData['location']),
+            'option'   => $option_data,
+            'quantity' => $product['quantity']
+          );
+
+          $alreadyInList = false;
+
+          foreach ($products_list as $key => $existing_product) {
+            if($existing_product['name'] == $thisProduct['name'] && $existing_product['model'] == $thisProduct['model'] && $existing_product['option'] == $thisProduct['option']) {
+              $products_list[$key]['quantity'] += $thisProduct['quantity'];
+              $alreadyInList = true;
+            }
+          }
+
+          if(!$alreadyInList) {
+            $products_list[] = $thisProduct;
+          }
+        }       
+      }
+    }
+
+    $data['products'] = $products_list;
+
+    $this->response->setOutput($this->load->view('sale/packing', $data));
+  }
+            ]]></add>
+      </operation>
+    </file>
+
+</modification>
