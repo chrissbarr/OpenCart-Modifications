@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Fix quantity calculation in Ozpost Shipping</name>
+    <version>1.0</version>
+    <code>FixQuantityCalcInOzpostShipping</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="catalog/model/extension/shipping/ozpost.php">
+        <operation>
+        	<search><![CDATA[
+            $price = $this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')) * $result['quantity'];
+            ]]></search>
+            <add position="replace"><![CDATA[
+            $price = $this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax'));
+            ]]></add>
+		</operation>
+	</file>
+
+</modification>
