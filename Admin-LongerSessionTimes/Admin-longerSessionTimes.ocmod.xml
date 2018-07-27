@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Extended Admin Login Time</name>
+    <version>1.0</version>
+    <code>ExtendedAdminLoginTime</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="system/library/session.php">
+        <operation>
+        	<search><![CDATA[
+        if (!session_id()) {
+            ini_set('session.use_cookies', 'On');
+            ini_set('session.use_trans_sid', 'Off');
+ 
+            session_set_cookie_params(0, '/');
+            session_start();
+        }
+            ]]></search>
+            <add position="replace"><![CDATA[
+        if (!session_id()) {
+            ini_set('session.use_cookies', 'On');
+            ini_set('session.use_trans_sid', 'Off');
+ 
+            /* Q-mod -- session extend */
+            session_set_cookie_params(86400, '/');
+            ini_set('session.cache_expire', '180');
+            ini_set('session.gc_maxlifetime', '86400');
+            ini_set('session.save_path','/system/sessions');
+ 
+            session_start();
+        }
+            ]]></add>
+		</operation>
+	</file>
+
+</modification>
