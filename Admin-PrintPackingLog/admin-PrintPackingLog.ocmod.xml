@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Print Packing Log</name>
+    <version>1.0</version>
+    <code>PrintPackingLog</code>
+    <author>Chris Barr</author>
+    <link></link>
+    
+    <file path="admin/view/template/sale/order_list.tpl">
+      <operation>
+        	<search><![CDATA[
+<button type="submit" id="button-invoice" form="form-order" formaction="<?php echo $invoice; ?>" formtarget="_blank" data-toggle="tooltip" title="<?php echo $button_invoice_print; ?>" class="btn btn-info"><i class="fa fa-print"></i></button>
+            ]]></search>
+            <add position="after"><![CDATA[
+        <button type="submit" id="button-packinglog" form="form-order" formaction="<?php echo $packing_log; ?>" formtarget="_blank" data-toggle="tooltip" title="Packing Log" class="btn btn-info"><i class="fa fa-print"></i></button>
+            ]]></add>
+		  </operation>
+    </file>
+
+
+    <file path="admin/controller/sale/order.php">
+      <operation>
+        <search><![CDATA[
+$data['invoice'] = $this->url->link('sale/order/invoice', 'token=' . $this->session->data['token'], true);
+            ]]></search>
+            <add position="before"><![CDATA[
+$data['packing_log'] = $this->url->link('sale/order/packinglog', 'token=' . $this->session->data['token'], true);
+            ]]></add>
+      </operation>
+
+      <operation>
+          <search><![CDATA[
+public function invoice() {
+            ]]></search>
+            <add position="before"><![CDATA[
+public function packinglog() {
+    $this->load->language('sale/order');
+
+    $data['title'] = 'Packing List';
+
+    if ($this->request->server['HTTPS']) {
+      $data['base'] = HTTPS_SERVER;
+    } else {
+      $data['base'] = HTTP_SERVER;
+    }
+
+    $this->load->model('sale/order');
+    $this->load->model('setting/setting');
+
+    $orders = array();
+
+    if (isset($this->request->post['selected'])) {
+      $orders = $this->request->post['selected'];
+    } elseif (isset($this->request->get['order_id'])) {
+      $orders[] = $this->request->get['order_id'];
+    }
+
+    foreach ($orders as $order_id) {
+      $order_info = $this->model_sale_order->getOrder($order_id);
+      if ($order_info) {
+
+        $this->load->model('tool/upload');
+
+        $product_data = array();
+
+        $products = $this->model_sale_order->getOrderProducts($order_id);
+
+        foreach ($products as $product) {
+          $option_data = array();
+
+          $options = $this->model_sale_order->getOrderOptions($order_id, $product['order_product_id']);
+
+          foreach ($options as $option) {
+            if ($option['type'] != 'file') {
+              $value = $option['value'];
+            } else {
+              $upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+
+              if ($upload_info) {
+                $value = $upload_info['name'];
+              } else {
+                $value = '';
+              }
+            }
+
+            $option_data[] = array(
+              'name'  => $option['name'],
+              'value' => $value
+            );
+          }
+
+          $product_data[] = array(
+            'name'     => $product['name'],
+            'model'    => $product['model'],
+            'option'   => $option_data,
+            'quantity' => $product['quantity'],
+            'price'    => $this->currency->format($product['price'] + ($this->config->get('config_tax') ? $product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
+            'total'    => $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value'])
+          );
+        }
+
+        $data['orders'][] = array(
+          'order_id'           => $order_id,
+          'date_added'         => date($this->language->get('date_format_short'), strtotime($order_info['date_added'])),
+          'email'              => $order_info['email'],
+          'telephone'          => $order_info['telephone'],
+          'shipping_method'    => $order_info['shipping_method'],
+          'shipping_firstname' => $order_info['shipping_firstname'],
+          'shipping_lastname'  => $order_info['shipping_lastname'],
+          'shipping_company'   => $order_info['shipping_company'],
+          'shipping_address_1' => $order_info['shipping_address_1'],
+          'shipping_address_2' => $order_info['shipping_address_2'],
+          'shipping_city'      => $order_info['shipping_city'],
+          'shipping_postcode'  => $order_info['shipping_postcode'],
+          'shipping_zone'      => $order_info['shipping_zone'],
+          'shipping_zone_code' => $order_info['shipping_zone_code'],
+          'shipping_country'   => $order_info['shipping_country'],
+          'product'            => $product_data,
+          'comment'            => nl2br($order_info['comment'])
+        );      
+      }
+    }
+
+    $this->response->setOutput($this->load->view('sale/order_packinglog', $data));
+  }
+            ]]></add>
+      </operation>
+    </file>
+
+</modification>
